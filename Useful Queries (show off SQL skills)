@@ -1,0 +1,11 @@
+WITH task_tags_agg AS (
+  SELECT tt.task_id, string_agg(t.name, ',') AS tags
+  FROM task_tags tt JOIN tags t ON tt.tag_id = t.tag_id
+  GROUP BY tt.task_id
+)
+SELECT tk.task_id, u.username, tk.title, tk.due_at, tk.priority, tta.tags
+FROM tasks tk
+JOIN users u ON u.user_id = tk.user_id
+LEFT JOIN task_tags_agg tta ON tta.task_id = tk.task_id
+WHERE tk.due_at < now() AND tk.status <> 'done'
+ORDER BY tk.priority ASC, tk.due_at ASC;
