@@ -1,0 +1,3 @@
+SELECT date_trunc('month', updated_at) AS month, count(*) FILTER (WHERE status='done') AS done_count
+FROM tasks
+GROUP BY month ORDER BY month DESC;
