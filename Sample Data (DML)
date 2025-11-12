@@ -1,0 +1,5 @@
+INSERT INTO users(username,email) VALUES ('alice','alice@example.com'), ('bob','bob@example.com');
+
+SELECT create_task_with_tags(1,'Finish report','Quarterly report', now() + INTERVAL '2 days', 2, ARRAY['work','urgent']);
+SELECT create_task_with_tags(1,'Grocery','Buy milk', NULL, 4, ARRAY['personal']);
+SELECT create_task_with_tags(2,'Server patch','Patch webserver', now() - INTERVAL '1 day', 1, ARRAY['ops','urgent']);
