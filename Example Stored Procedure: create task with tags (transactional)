@@ -1,0 +1,31 @@
+CREATE OR REPLACE FUNCTION create_task_with_tags(
+  p_user INT,
+  p_title TEXT,
+  p_desc TEXT,
+  p_due TIMESTAMPTZ,
+  p_priority INT,
+  p_tags TEXT[] -- array of tag names
+) RETURNS INT LANGUAGE plpgsql AS $$
+DECLARE
+  new_task INT;
+  t TEXT;
+  tagid INT;
+BEGIN
+  INSERT INTO tasks(user_id, title, description, due_at, priority)
+  VALUES (p_user, p_title, p_desc, p_due, p_priority)
+  RETURNING task_id INTO new_task;
+
+  IF p_tags IS NOT NULL THEN
+    FOREACH t IN ARRAY p_tags LOOP
+      -- upsert tag
+      INSERT INTO tags(name) VALUES (t)
+      ON CONFLICT (name) DO NOTHING;
+      SELECT tag_id FROM tags WHERE name = t INTO tagid;
+      INSERT INTO task_tags(task_id, tag_id) VALUES (new_task, tagid)
+      ON CONFLICT DO NOTHING;
+    END LOOP;
+  END IF;
+
+  RETURN new_task;
+END;
+$$;
